@@ -25,6 +25,8 @@ const API_KEY =
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
+
+
 let allBreedArray = []; // The array contains breeds objects
 
 async function initialLoad() {
