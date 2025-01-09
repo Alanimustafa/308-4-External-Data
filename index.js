@@ -1,4 +1,5 @@
 import * as Carousel from "./Carousel.js";
+
 // import axios from "axios";
 
 // The breed selection input element.
@@ -40,7 +41,7 @@ async function initialLoad() {
     console.log(allBreedArray);
     for (let i = 0; i < allBreedArray.length; i++) {
       let breedOption = document.createElement("option");
-      breedOption.value = breedsFetchJSON[i].id;
+      breedOption.value = breedsFetchJSON[i].id; // or breedOption.setAttribute("value", Breed.id);
       breedOption.text = breedsFetchJSON[i].name;
       breedSelect.appendChild(breedOption);
       // console.log(breedsFetchJSON[i]);
