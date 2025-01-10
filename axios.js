@@ -1,3 +1,4 @@
+
 import * as Carousel from "./Carousel.js";
 
 // import axios from "axios";
@@ -31,32 +32,33 @@ let allBreedArray = []; // The array contains breeds objects
 
 async function initialLoad() {
   try {
-    const breedsFetch = await fetch("https://api.thecatapi.com/v1/breeds", {
+    const breedAxios = await axios("https://api.thecatapi.com/v1/breeds", {
       headers: {
         "x-api-key": API_KEY,
       },
     });
-    const breedsFetchJSON = await breedsFetch.json();
+    // const breedsFetchJSON = await breedsFetch;
 
-    allBreedArray = breedsFetchJSON; // All breeds object have been collected in allBreedArray.
+    allBreedArray = breedAxios.data; // All breeds object have been collected in allBreedArray.
 
-    console.log(allBreedArray);
+    // console.log(allBreedArray);
     for (let i = 0; i < allBreedArray.length; i++) {
       let breedOption = document.createElement("option");
-      breedOption.value = breedsFetchJSON[i].id; // or breedOption.setAttribute("value", Breed.id);
-      breedOption.text = breedsFetchJSON[i].name;
+      breedOption.text = breedAxios.data[i].name;
       breedSelect.appendChild(breedOption);
-      // console.log(breedsFetchJSON[i]);
     }
-    // console.log(breedsFetchJSON[0].id);
+    // console.log(allBreedArray[0].id);
+
   } catch (error) {
     console.log(`ERROR: ${error}`);
   }
+  
 }
 
  initialLoad();
 
-/**
+/**  // Point (2) in the assignment is in index.js. Make sure to activate the index.js script tag in the index.html file. AND enable the axios.js import in Carousel.js.
+ 
  * 2. Create an event handler for breedSelect that does the following:
  * - Retrieve information on the selected breed from the cat API using fetch().
  *  - Make sure your request is receiving multiple array items!
@@ -71,59 +73,12 @@ async function initialLoad() {
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
 
-breedSelect.addEventListener("change", retreiveTheBreed);
 
-let breedDetail = []; // The array for each breed property.
-async function retreiveTheBreed() {
-  Carousel.clear(); //clears the existing images and info
-  try {
-    const selectedBreed = breedSelect.value;
-    // console.log("Selected value:", selectedBreed);
-    let breedURL = "https://api.thecatapi.com/v1/breeds/" + selectedBreed;
-    const responseBreed = await fetch(breedURL, {
-      headers: {
-        "x-api-key": API_KEY,
-      },
-    });
-    // console.log(breedURL);
-    const dataBreed = await responseBreed.json();
-    breedDetail = dataBreed;
 
-    // this section is to fetch 10 images of the selected breed
-    let previousImgID = ""; //this is to check if consecutive images are same if so break out of loop
-
-    for (let i = 0; i < 11; i++) {
-      let breedImageURL =
-        "https://api.thecatapi.com/v1/images/search?breed_ids=" + selectedBreed; //creating url using
-      const responseImage = await fetch(breedImageURL, {
-        headers: {
-          "x-api-key": API_KEY,
-        },
-      });
-
-      const dataImage = await responseImage.json();
-      const url = dataImage[0].url;
-      const imageID = dataImage[0].id;
-      if (imageID === previousImgID) break; //if two images are the same then end loop
-      previousImgID = imageID;
-      const imgAlt = "Image of " + dataImage[0].breeds[0].name;
-
-      const imageItem = Carousel.createCarouselItem(url, imgAlt, imageID);
-      Carousel.appendCarousel(imageItem);
-    }
-
-    // infoDump.textContent = breedDetail[i].data;
-    // Carousel.appendChild(infoDump);
-    Carousel.start();
-  } catch (error) {
-    console.log(`Error: ${error}`);
-  }
-}
-
-/**  // Point (3) (4) in the assignment is in axios.js. Make sure to activate the axios.js script tag in the index.html file AND enable the index.js import in Carousel.js.
+/**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
-/** // Point (3) (4) in the assignment is in axios.js. Make sure to activate the axios.js script tag in the index.html file AND enable the index.js import in Carousel.js..
+/**
  * 4. Change all of your fetch() functions to axios!
  * - axios has already been imported for you within index.js.
  * - If you've done everything correctly up to this point, this should be simple.
@@ -132,6 +87,76 @@ async function retreiveTheBreed() {
  *   by setting a default header with your API key so that you do not have to
  *   send it manually with all of your requests! You can also set a default base URL!
  */
+
+breedSelect.addEventListener("change", retreiveTheBreed);
+
+let breedDetail = []; // The array for each breed property.
+
+async function retreiveTheBreed() {
+  Carousel.clear(); //clears the existing images and info
+  try {
+    const selectedBreed = breedSelect.value;
+     console.log("Selected breed value:", selectedBreed);
+
+    let breedURL = "https://api.thecatapi.com/v1/breeds/" + selectedBreed; // creating the url according to the breed value.
+
+    const dataBreed = await axios(breedURL, {
+      headers: {
+        "x-api-key": API_KEY,
+      },
+    });
+     console.log(breedURL);
+     // console.log(selectedBreed);
+
+
+     breedDetail = await dataBreed;
+
+    // this section is to fetch 10 images of the selected breed
+    let previousImgID = ""; //this is to check if consecutive images are same if so break out of loop
+
+    for (let i = 0; i < 11; i++) {
+      let breedImageURL =
+        "https://api.thecatapi.com/v1/images/search?breed_ids=" + selectedBreed; //Making the url by adding the selectedBreed id.
+      const dataImage = await axios(breedImageURL, {
+        headers: {
+          "x-api-key": API_KEY, // adding the API key to the header.
+        },
+      });
+
+        // carouselInner Div
+      const innerCarousel = document.createElement ('h1');
+      innerCarousel.classList.add('innerCarousel');
+      innerCarousel.textContent = breedDetail.data.name ;
+      infoDump.appendChild(innerCarousel);
+      infoDump.textContent = breedDetail.data.description;
+      console.log(breedDetail);
+      //console.log("The Data Image isssss : " ,dataImage.data[0].url);
+      // const dataImage = await responseImage;
+      const url = dataImage[0].url;
+      console.log ("The url test Console   ",dataImage)
+
+
+      const imageID = dataImage[0].id;
+
+      console.log (imageID);
+
+      if (imageID === previousImgID) break; //if two images are the same then end loop
+      previousImgID = imageID;
+      const imgAlt = "Image of " + dataImage[0].breeds[0].name;
+
+      const imageItem = Carousel.createCarouselItem(url, imgAlt, imageID);
+      Carousel.appendCarousel(imageItem);
+      console.log(breedDetail[0])
+      
+    }
+    Carousel.start();
+  } catch (error) {
+    console.log(`Error: ${error}`);
+  }
+}
+
+
+
 /**
  * 5. Add axios interceptors to log the time between request and response to the console.
  * - Hint: you already have access to code that does this!
