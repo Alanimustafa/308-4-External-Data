@@ -1,4 +1,3 @@
-
 import * as Carousel from "./Carousel.js";
 
 // import axios from "axios";
@@ -95,6 +94,7 @@ let breedDetail = []; // The array for each breed property.
 async function retreiveTheBreed() {
   Carousel.clear(); //clears the existing images and info
   try {
+    interceptorReq();
     const selectedBreed = breedSelect.value;
      console.log("Selected breed value:", selectedBreed);
 
@@ -123,13 +123,14 @@ async function retreiveTheBreed() {
         },
       });
 
-        // carouselInner Div
-      const innerCarousel = document.createElement ('h1');
-      innerCarousel.classList.add('innerCarousel');
-      innerCarousel.textContent = breedDetail.data.name ;
-      infoDump.appendChild(innerCarousel);
       infoDump.textContent = breedDetail.data.description;
       console.log(breedDetail);
+        // carouselInner Div
+        const innerCarousel = document.createElement ('h1');
+        //innerCarousel.classList.add('innerCarousel');
+        innerCarousel.textContent = breedDetail.data.name; ;
+        infoDump.appendChild(innerCarousel);
+  
       //console.log("The Data Image isssss : " ,dataImage.data[0].url);
       // const dataImage = await responseImage;
       const url = dataImage[0].url;
@@ -151,7 +152,7 @@ async function retreiveTheBreed() {
     }
     Carousel.start();
   } catch (error) {
-    console.log(`Error: ${error}`);
+    //console.log(`Error: ${error}`);
   }
 }
 
@@ -164,6 +165,43 @@ async function retreiveTheBreed() {
  * - As an added challenge, try to do this on your own without referencing the lesson material.
  */
 
+async function interceptorReq () {
+  axios.interceptors.request.use(request => {
+    request.metadata = request.metadata || {};
+    request.metadata.startTime = new Date().getTime();
+    document.body.style.cursor = "progress";
+    progressBar.style.width = "0px";
+    return request;
+});
+
+axios.interceptors.response.use(
+    (response) => {
+        response.config.metadata.endTime = new Date().getTime();
+        response.config.metadata.durationInMS = response.config.metadata.endTime - response.config.metadata.startTime;
+
+        console.log(`Request took ${response.config.metadata.durationInMS} milliseconds.`)
+        document.body.style.cursor = "default";
+        progressBar.style.width = '100%';
+        return response;
+    },
+    (error) => {
+        error.config.metadata.endTime = new Date().getTime();
+        error.config.metadata.durationInMS = error.config.metadata.endTime - error.config.metadata.startTime;
+
+        console.log(`Request took ${error.config.metadata.durationInMS} milliseconds.`)
+        throw error;
+});
+
+}
+
+
+function updateProgress(event) {
+  console.log(event); 
+  if (event.lengthComputable) {
+      const percentCompleted = (event.loaded / event.total) * 100;
+      progressBar.style.width = `${percentCompleted}%`;
+  }
+}
 /**
  * 6. Next, we'll create a progress bar to indicate the request is in progress.
  * - The progressBar element has already been created for you.
@@ -180,11 +218,15 @@ async function retreiveTheBreed() {
  *   with for future projects.
  */
 
-/**
+
+
+/** // Has been done within the intercepter funciton.
  * 7. As a final element of progress indication, add the following to your axios interceptors:
  * - In your request interceptor, set the body element's cursor style to "progress."
  * - In your response interceptor, remove the progress cursor style from the body element.
  */
+
+
 /**
  * 8. To practice posting data, we'll create a system to "favourite" certain images.
  * - The skeleton of this function has already been created for you.
@@ -197,7 +239,17 @@ async function retreiveTheBreed() {
  * - You can call this function by clicking on the heart at the top right of any image.
  */
 export async function favourite(imgId) {
-  // your code here
+  alert("the ima id: " , imgId);
+  const response = await fetch(
+    'https://api.thecatapi.com/v1/favourites?limit=20&sub_id=user-123&order=DESC',{
+        headers:{
+            "content-type":"application/json",
+            'x-api-key': API_KEY
+        }
+    });
+    const favourites = await response.json();
+    console.log(favourites);
+
 }
 
 /**

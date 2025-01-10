@@ -109,6 +109,7 @@ async function retreiveTheBreed() {
       const imgAlt = "Image of " + dataImage[0].breeds[0].name;
 
       const imageItem = Carousel.createCarouselItem(url, imgAlt, imageID);
+      console.log("the Image Id sdsd ", imageID);
       Carousel.appendCarousel(imageItem);
     }
 
@@ -155,6 +156,14 @@ async function retreiveTheBreed() {
  *   with for future projects.
  */
 
+function updateProgress(event) {
+  console.log(event); 
+  if (event.lengthComputable) {
+      const percentCompleted = (event.loaded / event.total) * 100;
+      progressBar.style.width = `${percentCompleted}%`;
+  }
+}
+
 /**
  * 7. As a final element of progress indication, add the following to your axios interceptors:
  * - In your request interceptor, set the body element's cursor style to "progress."
@@ -172,7 +181,18 @@ async function retreiveTheBreed() {
  * - You can call this function by clicking on the heart at the top right of any image.
  */
 export async function favourite(imgId) {
-  // your code here
+  console.log("the imag id: " , imgId);
+  const response = await fetch(
+    'https://api.thecatapi.com/v1/favourites?limit=20&sub_id=user-123&order=DESC',{
+        headers:{
+            "content-type":"application/json",
+            'x-api-key': API_KEY
+        }
+    });
+    const favourites = await response.json();
+    console.log(favourites);
+
+
 }
 
 /**

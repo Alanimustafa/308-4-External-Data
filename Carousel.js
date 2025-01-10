@@ -1,5 +1,5 @@
 //import * as bootstrap from "bootstrap";
-// import { favourite } from "./axios.js";
+ // import { favourite } from "./axios.js";
  import { favourite } from "./index.js";
 
 
