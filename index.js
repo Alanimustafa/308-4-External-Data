@@ -40,15 +40,16 @@ async function initialLoad() {
 
     allBreedArray = breedsFetchJSON; // All breeds object have been collected in allBreedArray.
 
-    console.log(allBreedArray);
+    // console.log(allBreedArray);
     for (let i = 0; i < allBreedArray.length; i++) {
       let breedOption = document.createElement("option");
       breedOption.value = breedsFetchJSON[i].id; // or breedOption.setAttribute("value", Breed.id);
       breedOption.text = breedsFetchJSON[i].name;
       breedSelect.appendChild(breedOption);
-      // console.log(breedsFetchJSON[i]);
     }
-    // console.log(breedsFetchJSON[0].id);
+
+    breedSelect.addEventListener ('change', retreiveTheBreedInfo)
+    
   } catch (error) {
     console.log(`ERROR: ${error}`);
   }
@@ -56,45 +57,33 @@ async function initialLoad() {
 
  initialLoad();
 
-/**
- * 2. Create an event handler for breedSelect that does the following:
- * - Retrieve information on the selected breed from the cat API using fetch().
- *  - Make sure your request is receiving multiple array items!
- *  - Check the API documentation if you're only getting a single object.
- * - For each object in the response array, create a new element for the carousel.
- *  - Append each of these new elements to the carousel.
- * - Use the other data you have been given to create an informational section within the infoDump element.
- *  - Be creative with how you create DOM elements and HTML.
- *  - Feel free to edit index.html and styles.css to suit your needs, but be careful!
- *  - Remember that functionality comes first, but user experience and design are important.
- * - Each new selection should clear, re-populate, and restart the Carousel.
- * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
- */
 
-breedSelect.addEventListener("change", retreiveTheBreed);
+  let breedDetailsArray = []; 
 
-let breedDetail = []; // The array for each breed property.
-async function retreiveTheBreed() {
-  Carousel.clear(); //clears the existing images and info
+ async function retreiveTheBreedInfo () {
+  Carousel.clear(); // To clear the existing images and info ;
   try {
-    const selectedBreed = breedSelect.value;
-    // console.log("Selected value:", selectedBreed);
-    let breedURL = "https://api.thecatapi.com/v1/breeds/" + selectedBreed;
-    const responseBreed = await fetch(breedURL, {
-      headers: {
-        "x-api-key": API_KEY,
-      },
-    });
-    // console.log(breedURL);
-    const dataBreed = await responseBreed.json();
-    breedDetail = dataBreed;
+    const selectedBreedInfo = breedSelect.value; // Saving the selected breed info in selectedBreedInfo variable.
+    console.log("The Selected Breed Value  :  ",selectedBreedInfo); // Test Point.
+    let selectedBreedURL = "https://api.thecatapi.com/v1/breeds/" + selectedBreedInfo;
+    console.log("The Selected Breed URL  :  ",selectedBreedURL); // Test Point.
+    const responseBreed = await fetch(selectedBreedURL, {
+            headers: {
+              "x-api-key": API_KEY,
+            },
+          });
+    console.log(responseBreed); // Test Point.
 
-    // this section is to fetch 10 images of the selected breed
+    let theresponseBreedJSON = responseBreed.json();
+    breedDetailsArray = theresponseBreedJSON;
+    console.log(breedDetailsArray); // Test Point.
+
+        // this section is to fetch 10 images of the selected breed
     let previousImgID = ""; //this is to check if consecutive images are same if so break out of loop
 
     for (let i = 0; i < 11; i++) {
       let breedImageURL =
-        "https://api.thecatapi.com/v1/images/search?breed_ids=" + selectedBreed; //creating url using
+        "https://api.thecatapi.com/v1/images/search?breed_ids=" + selectedBreedInfo; //creating url using
       const responseImage = await fetch(breedImageURL, {
         headers: {
           "x-api-key": API_KEY,
@@ -113,13 +102,101 @@ async function retreiveTheBreed() {
       Carousel.appendCarousel(imageItem);
     }
 
-    // infoDump.textContent = breedDetail[i].data;
-    // Carousel.appendChild(infoDump);
+    //  infoDump.textContent = breedDetail[i].data;
+    //  Carousel.appendChild(infoDump);
     Carousel.start();
-  } catch (error) {
-    console.log(`Error: ${error}`);
+
+  } catch (error ){
+    console.log ("ERROR: Retrieving Breed Information :", error);
   }
-}
+
+ }
+/**
+ * 2. Create an event handler for breedSelect that does the following:
+ * - Retrieve information on the selected breed from the cat API using fetch().
+ *  - Make sure your request is receiving multiple array items!
+ *  - Check the API documentation if you're only getting a single object.
+ * - For each object in the response array, create a new element for the carousel.
+ *  - Append each of these new elements to the carousel.
+ * - Use the other data you have been given to create an informational section within the infoDump element.
+ *  - Be creative with how you create DOM elements and HTML.
+ *  - Feel free to edit index.html and styles.css to suit your needs, but be careful!
+ *  - Remember that functionality comes first, but user experience and design are important.
+ * - Each new selection should clear, re-populate, and restart the Carousel.
+ * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
+ */
+
+
+
+
+// breedSelect.addEventListener("change", retreiveTheBreed);
+
+// let breedDetail = []; // The array for each breed property.
+
+// async function retreiveTheBreed() {
+//   Carousel.clear(); //clears the existing images and info
+//   try {
+
+//     const selectedBreed = breedSelect.value;
+//     // console.log("Selected value:", selectedBreed);
+
+//     let breedURL = "https://api.thecatapi.com/v1/breeds/" + selectedBreed;
+
+//     const responseBreed = await fetch(breedURL, {
+//       headers: {
+//         "x-api-key": API_KEY,
+//       },
+//     });
+//     // console.log(breedURL);
+//     const dataBreed = await responseBreed.json();
+//     breedDetail = dataBreed;
+
+//     // this section is to fetch 10 images of the selected breed
+//     let previousImgID = ""; //this is to check if consecutive images are same if so break out of loop
+
+//     for (let i = 0; i < 11; i++) {
+//       let breedImageURL =
+//         "https://api.thecatapi.com/v1/images/search?breed_ids=" + selectedBreed; //creating url using
+//       const responseImage = await fetch(breedImageURL, {
+//         headers: {
+//           "x-api-key": API_KEY,
+//         },
+//       });
+
+//       const dataImage = await responseImage.json();
+//       const url = dataImage[0].url;
+//       const imageID = dataImage[0].id;
+//       if (imageID === previousImgID) break; //if two images are the same then end loop
+//       previousImgID = imageID;
+//       const imgAlt = "Image of " + dataImage[0].breeds[0].name;
+
+//       const imageItem = Carousel.createCarouselItem(url, imgAlt, imageID);
+//       console.log("the Image Id sdsd ", imageID);
+//       Carousel.appendCarousel(imageItem);
+//     }
+
+//     // infoDump.textContent = breedDetail[i].data;
+//     // Carousel.appendChild(infoDump);
+//     Carousel.start();
+//   } catch (error) {
+//     console.log(`Error: ${error}`);
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**  // Point (3) (4) in the assignment is in axios.js. Make sure to activate the axios.js script tag in the index.html file AND enable the index.js import in Carousel.js.
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
@@ -156,13 +233,6 @@ async function retreiveTheBreed() {
  *   with for future projects.
  */
 
-function updateProgress(event) {
-  console.log(event); 
-  if (event.lengthComputable) {
-      const percentCompleted = (event.loaded / event.total) * 100;
-      progressBar.style.width = `${percentCompleted}%`;
-  }
-}
 
 /**
  * 7. As a final element of progress indication, add the following to your axios interceptors:
@@ -180,20 +250,31 @@ function updateProgress(event) {
  *   you delete that favourite using the API, giving this function "toggle" functionality.
  * - You can call this function by clicking on the heart at the top right of any image.
  */
+
+
+
+
+
 export async function favourite(imgId) {
   console.log("the imag id: " , imgId);
   const response = await fetch(
     'https://api.thecatapi.com/v1/favourites?limit=20&sub_id=user-123&order=DESC',{
         headers:{
             "content-type":"application/json",
-            'x-api-key': API_KEY
+            'x-api-key': API_KEY,
         }
     });
     const favourites = await response.json();
     console.log(favourites);
-
-
 }
+
+
+
+
+
+
+
+
 
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.

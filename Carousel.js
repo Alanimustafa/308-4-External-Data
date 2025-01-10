@@ -1,6 +1,6 @@
 //import * as bootstrap from "bootstrap";
  // import { favourite } from "./axios.js";
- import { favourite } from "./index.js";
+  import { favourite } from "./index.js";
 
 
 
@@ -8,7 +8,7 @@
 export function createCarouselItem(imgSrc, imgAlt, imgId) {
   const template = document.querySelector("#carouselItemTemplate");
   const clone = template.content.firstElementChild.cloneNode(true);
-
+  
   const img = clone.querySelector("img");
   img.src = imgSrc;
   img.alt = imgAlt;
