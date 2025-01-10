@@ -78,19 +78,20 @@ async function retreiveTheBreed() {
     const dataBreed = await axios.get(`/breeds/${selectedBreed}`);
 
     breedDetail = dataBreed.data;
+    
+    infoDump.textContent = breedDetail.description;
+    const innerCarousel = document.createElement("h1");
+    innerCarousel.textContent = breedDetail.name;
+    infoDumpHeader.appendChild(innerCarousel);
 
-    // This section is to fetch 10 images of the selected breed
+    // fetch the images of the selected breed
     let previousImgID = ""; // This is to check if consecutive images are the same, if so break out of loop
 
-    for (let i = 0; i < 11; i++) {
+    for (let i = 0; i < 10; i++) {
       const dataImage = await axios.get(`/images/search`, {
         params: { breed_ids: selectedBreed },
       });
 
-      infoDump.textContent = breedDetail.description;
-      const innerCarousel = document.createElement("h1");
-      innerCarousel.textContent = breedDetail.name;
-      infoDump.appendChild(innerCarousel);
 
       const url = dataImage.data[0].url;
       const imageID = dataImage.data[0].id;
